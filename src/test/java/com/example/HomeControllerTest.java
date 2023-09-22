@@ -13,6 +13,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HomeControllerTest {
@@ -31,6 +33,19 @@ public class HomeControllerTest {
     void testHandler() {
         APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
         request.setPath("/");
+        request.setHttpMethod(HttpMethod.GET.toString());
+        APIGatewayProxyResponseEvent response = handler.handleRequest(request, lambdaContext);
+        assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
+        assertEquals("{\"message\":\"Hello World\"}",  response.getBody());
+    }
+
+    @Test
+    void testHandlerWithEmptyHeader() {
+        APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
+        request.setPath("/");
+
+        Map<String, String> headers = Map.of("Accept-Language","");
+        request.setHeaders(headers);
         request.setHttpMethod(HttpMethod.GET.toString());
         APIGatewayProxyResponseEvent response = handler.handleRequest(request, lambdaContext);
         assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
