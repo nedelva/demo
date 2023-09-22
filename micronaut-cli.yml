@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.example
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [app-name, aws-lambda, aws-lambda-custom-runtime, aws-lambda-events-serde, aws-lambda-handler-default, http-client, java, junit, logback, maven, maven-enforcer-plugin, micronaut-aot, properties, readme, serialization-jackson, shade, snapstart, x86]
