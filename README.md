@@ -1,3 +1,13 @@
+## Issues showcased
+
+- 8 Nov 2023: micronaut-function-aws-api-proxy HTTP headers are not correctly read from request
+
+    This is a regression starting with Micronaut Platform version 4.1.4, which imports Micronaut Core BOM 4.1.9.
+
+    Micronaut Core BOM 4.1.9 specifies io.micronaut.aws:micronaut-function-aws-api-proxy:4.0.5
+
+    The tests in class AnotherHomeControllerTest are successful for _micronaut-function-aws-api-proxy_ versions in range [4.0.0,4.0.4]
+    while for version in range [4.0.5,4.1.1] second test fails.     
 ## Micronaut 4.1.1 Documentation
 
 - [User Guide](https://docs.micronaut.io/4.1.1/guide/index.html)

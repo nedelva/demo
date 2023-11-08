@@ -1,9 +1,9 @@
 package com.example;
+
 import com.amazonaws.services.lambda.runtime.ClientContext;
 import com.amazonaws.services.lambda.runtime.CognitoIdentity;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
-
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import io.micronaut.function.aws.proxy.payload1.ApiGatewayProxyRequestEventFunction;
@@ -18,10 +18,11 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * testHandlerWithEmptyHeader fails with java.lang.StringIndexOutOfBoundsException: String index out of range: 0
- * for Micronaut version 4.1.2
+ * Single-value HTTP header handling tests
+ * For micronaut-function-aws-api-proxy version in range [4.0.0,4.0.4] both tests succeed,
+ * while for version in range [4.0.5,4.1.1] second test fails
  */
-public class HomeControllerTest {
+public class AnotherHomeControllerTest {
     private static ApiGatewayProxyRequestEventFunction handler;
 
     @BeforeAll
@@ -34,26 +35,25 @@ public class HomeControllerTest {
     }
 
     @Test
-    void testHandler() {
+    void testValidateTokenNoHeader() {
         APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
-        request.setPath("/");
+        request.setPath("/validate/token");
         request.setHttpMethod(HttpMethod.GET.toString());
         APIGatewayProxyResponseEvent response = handler.handleRequest(request, lambdaContext);
-        assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
-        assertEquals("{\"message\":\"Hello World\"}",  response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST.getCode(), response.getStatusCode());
+        assertEquals("{\"_links\":{\"self\":[{}]},\"_embedded\":{\"errors\":[{\"message\":\"Required Header [accessToken] not specified\",\"path\":\"/oAuthToken\"}]},\"message\":\"Bad Request\"}",  response.getBody());
     }
-
     @Test
-    void testHandlerWithEmptyHeader() {
+    void testValidateTokenHeaderPresent() {
         APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
-        request.setPath("/");
-
-        Map<String, String> headers = Map.of("Accept-Language","");
-        request.setHeaders(headers);
+        request.setPath("/validate/token");
         request.setHttpMethod(HttpMethod.GET.toString());
+        Map<String, String> headers = Map.of("accessToken","some-token-here");
+        request.setHeaders(headers);
+
         APIGatewayProxyResponseEvent response = handler.handleRequest(request, lambdaContext);
         assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
-        assertEquals("{\"message\":\"Hello World\"}",  response.getBody());
+        assertEquals("User 'AuthorizedUser' VALIDATED",  response.getBody());
     }
 
    static final Context lambdaContext = new Context() {
